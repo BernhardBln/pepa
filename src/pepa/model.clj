@@ -472,15 +472,17 @@
                                   (pdf/split-pdf data (map :number pages)))]))
             pages (map #(assoc % :pdf-file (get-in page-files [(:file %) (:number %)])) pages)]
         (let [page-files (map :pdf-file pages)]
-          (try
-            ;; Rotate the pages if necessary
-            (let [page-files (for [page pages]
-                               (let [original (:pdf-file page)]
-                                 (pdf/rotate-pdf-file original (:rotation page))))]
-              (pdf/merge-pages page-files))
-            (finally
-              (doseq [file page-files]
-                (.delete file)))))))
+          (if (<= (count page-files) 1)
+            (first page-files)
+            (try
+              ;; Rotate the pages if necessary
+              (let [page-files (for [page pages]
+                                 (let [original (:pdf-file page)]
+                                   (pdf/rotate-pdf-file original (:rotation page))))]
+                (pdf/merge-pages page-files))
+              (finally
+                (doseq [file page-files]
+                  (.delete file))))))))
     (catch IOException e
       (log/error db e "Couldn't generate PDF")
       ;; Rethrow

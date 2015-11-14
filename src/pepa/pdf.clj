@@ -174,7 +174,7 @@
         exit-code (.waitFor process)]
     (when-not (zero? exit-code)
       (.delete file)
-      (throw (ex-info "pdfunit didn't terminate correctly"
+      (throw (ex-info "pdfunite didn't terminate correctly"
                       {:exit-code exit-code
                        :args args
                        :pages pages})))
